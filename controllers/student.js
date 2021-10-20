@@ -1,13 +1,11 @@
-const database = require('../config/database')
+const express = require('express')
+router = express.Router()
 
-const Student = require('../models/Student')
+const student = require('../services/student')
+ 
+router.get('/', student.getAllStudents)
+router.get('/login', student.login)
+router.get('/helloWorld', student.helloWorld)
+router.post('/register', student.registerStudent)
 
-exports.getAllStudents = ((req, res) => {
-    Student.findAll()
-        .then(value => {
-            console.log(value)
-            res.send(value)
-        })
-        .catch(error => console.log(`Error: ${error}`))
-    res.send(402)
-})
+module.exports = router

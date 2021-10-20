@@ -1,13 +1,8 @@
-const database = require('../config/database')
+const express = require('express')
+router = express.Router()
 
-const Category = require('../models/Category')
+const category = require('../services/category')
+ 
+router.get('/', category.getAllCategories)
 
-exports.getAllCategories = ((req, res) => {
-    Category.findAll()
-        .then(value => {
-            console.log(value)
-            res.sendStatus(value)
-        })
-        .catch(error => console.log(`Error: ${error}`))
-    res.send(402)
-})
+module.exports = router

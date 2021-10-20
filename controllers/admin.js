@@ -1,13 +1,8 @@
-const database = require('../config/database')
+const express = require('express')
+router = express.Router()
 
-const Admin = require('../models/Admin')
+const admin = require('../services/admin')
+ 
+router.get('/', admin.getAllAdmins)
 
-exports.getAllAdmins = ((req, res) => {
-    Admin.findAll()
-        .then(value => {
-            console.log(value)
-            res.send(value)
-        })
-        .catch(error => console.log(`Error: ${error}`))
-    res.send(402)
-})
+module.exports = router

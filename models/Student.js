@@ -1,4 +1,6 @@
 const { STRING, UUIDV4, DATE, DOUBLE } = require('sequelize');
+const bcrypt = require('bcrypt')
+
 const database = require('../config/database')
 
 const Student = database.define('student', {
@@ -9,7 +11,7 @@ const Student = database.define('student', {
     },
     password: {
         type: STRING(50),
-        allowNull: false
+        allowNull: false,
     },
     firstname: {
         type: STRING(50),
@@ -20,7 +22,7 @@ const Student = database.define('student', {
     },
     lastname: {
         type: STRING(50),
-        allowNull: false
+        allowNull: false,
     },
     emailaddress: {
         type: STRING(62),
@@ -41,9 +43,12 @@ const Student = database.define('student', {
     }
 }, {
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
+    hooks: {
+        afterValidate: (student) => {
+            student.password = bcrypt.hashSync(student.password, 10)
+        }
+    }
 })
 
 module.exports = Student;
-
-

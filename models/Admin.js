@@ -39,5 +39,3 @@ const Admin = database.define('admin', {
 })
 
 module.exports = Admin;
-
-

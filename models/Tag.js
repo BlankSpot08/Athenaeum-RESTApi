@@ -1,7 +1,7 @@
 const { STRING, UUIDV4 } = require('sequelize');
 const database = require('../config/database')
 
-const Category = database.define('category', {
+const Tag = database.define('tag', {
     id: {
         type: UUIDV4,
         allowNull: false,
@@ -11,14 +11,10 @@ const Category = database.define('category', {
         type: STRING(30),
         allowNull: false,
         unique: true
-    },
-    description: {
-        type: STRING(1000),
-        allowNull: false
     }
 }, {
     freezeTableName: true,
     timestamps: false
 })
 
-module.exports = Category;
+module.exports = Tag;

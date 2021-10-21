@@ -48,7 +48,7 @@ const Student = database.define('student', {
         afterValidate: (student) => {
             student.password = bcrypt.hashSync(student.password, 10)
         }
-    }
+    },
 })
 
 module.exports = Student;

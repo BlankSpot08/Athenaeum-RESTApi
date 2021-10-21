@@ -1,11 +1,13 @@
 const { STRING, UUIDV4, DATE, DOUBLE } = require('sequelize');
 const database = require('../config/database')
 
+const bcrypt = require('bcrypt')
+
 const Admin = database.define('admin', {
     id: {
         type: STRING,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
     },
     password: {
         type: STRING(50),
@@ -35,7 +37,12 @@ const Admin = database.define('admin', {
     }
 }, {
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
+    hooks: {
+        afterValidate: (admin) => {
+            admin.password = bcrypt.hashSync(admin.password, 10)
+        }
+    },
 })
 
 module.exports = Admin;

@@ -31,6 +31,6 @@ const BookEntered = database.define('book_entered', {
     // underscored: true
 })
 
-BookEntered.hasOne(Admin, {foreignKey: 'createdBy'})
+BookEntered.hasOne(Admin, {foreignKey: 'id'})
 
 module.exports = BookEntered;

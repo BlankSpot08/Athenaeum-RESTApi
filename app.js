@@ -12,6 +12,7 @@ const category = require('./controllers/category')
 const student = require('./controllers/student')
 const admin = require('./controllers/admin')
 const bookEntered = require('./controllers/bookEntered')
+const book = require('./controllers/book')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -20,6 +21,17 @@ app.use('/category', category)
 app.use('/student', student)
 app.use('/admin', admin)
 app.use('/bookEntered', bookEntered)
+app.use('/book', book)
+
+// const Publisher = require('./models/Publisher')
+
+// Publisher.findAll({ raw: true })
+//     .then((publisher) => {
+//         console.log(publisher)
+//     })
+//     .catch(error => {
+//         console.log(`Error: ${error}`)
+//     })
 
 const PORT = process.env.PORT || 3000
 

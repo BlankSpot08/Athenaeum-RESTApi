@@ -16,7 +16,7 @@ const Author = database.define('author', {
     email: {
         type: STRING(62),
     },
-    contactNo: {
+    contactno: {
         type: STRING(16)
     },
     address: {

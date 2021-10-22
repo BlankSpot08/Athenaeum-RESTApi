@@ -2,6 +2,7 @@ const { STRING, UUIDV4, DATE, TINYINT, SMALLINT } = require('sequelize');
 const database = require('../config/database')
 
 const Admin = require('../models/Admin')
+const Book = require('../models/Book')
 
 const BookEntered = database.define('book_entered', {
     id: {
@@ -12,6 +13,7 @@ const BookEntered = database.define('book_entered', {
     book_isbn_number: {
         type: STRING(20),
         allowNull: false,
+        foreignKey: true
     },
     date_created: {
         type: DATE,
@@ -20,6 +22,7 @@ const BookEntered = database.define('book_entered', {
     created_by: {
         type: STRING(20),
         allowNull: false,
+        foreignKey: true
     },
     borrowed: {
         type: SMALLINT,
@@ -28,9 +31,14 @@ const BookEntered = database.define('book_entered', {
 }, {
     freezeTableName: true,
     timestamps: false,
-    // underscored: true
+    underscored: true
 })
 
-BookEntered.hasOne(Admin, {foreignKey: 'id'})
+BookEntered.hasOne(Admin, {
+    foreignKey: 'id'
+})
+BookEntered.belongsTo(Book, {
+    foreignKey: 'book_isbn_number'
+})
 
 module.exports = BookEntered;

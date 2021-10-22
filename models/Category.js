@@ -21,4 +21,8 @@ const Category = database.define('category', {
     timestamps: false
 })
 
+// Category.hasOne(Book, {
+//     foreignKey: 'category_id'
+// })
+
 module.exports = Category;

@@ -1,5 +1,6 @@
 const { STRING, UUIDV4  } = require('sequelize');
 
+const Book = require('../models/Book')
 const database = require('../config/database')
 
 const Publisher = database.define('publisher', {
@@ -16,7 +17,7 @@ const Publisher = database.define('publisher', {
     email: {
         type: STRING(62),
     },
-    contactNo: {
+    contactno: {
         type: STRING(16)
     },
     address: {
@@ -26,5 +27,11 @@ const Publisher = database.define('publisher', {
     freezeTableName: true,
     timestamps: false,
 })
+
+// Publisher.associations((model) => {
+//     this.hasOne = () => {
+//         s
+//     }
+// })
 
 module.exports = Publisher;

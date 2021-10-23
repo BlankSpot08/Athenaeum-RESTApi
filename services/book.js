@@ -159,30 +159,7 @@ exports.register = async (req, res) => {
             raw: true
         })
 
-        // book.addBookEntered(bookEntered)
-        const test = await Book.findByPk("15254569", {
-            include: [
-                {
-                    "model": Category
-                },
-                {
-                    "model": Publisher
-                },
-                {
-                    "model": Tag
-                },
-                {
-                    "model": Author
-                },
-                {
-                    "model": BookEntered
-                }
-            ]
-        })
-
-        // console.log(test)
-
-        res.send(test)
+        res.send(200)
     } catch(error) {
         console.log(`Error: ${error}`)
         res.sendStatus(400)

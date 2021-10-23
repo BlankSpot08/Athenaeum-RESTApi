@@ -29,10 +29,4 @@ const Publisher = database.define('publisher', {
     timestamps: false,
 })
 
-// Publisher.associations((model) => {
-//     this.hasOne = () => {
-//         s
-//     }
-// })
-
 module.exports = Publisher;

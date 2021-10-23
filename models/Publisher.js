@@ -8,6 +8,7 @@ const Publisher = database.define('publisher', {
         type: UUIDV4,
         allowNull: false,
         primaryKey: true,
+        defaultValue: UUIDV4
     },
     name: {
         type: STRING(100),

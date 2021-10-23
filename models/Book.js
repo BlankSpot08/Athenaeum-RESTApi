@@ -6,7 +6,8 @@ const Category = require('../models/Category')
 const Tag = require('../models/Tag')
 const BookTag = require('../models/BookTag')
 const Author = require('../models/Author')
-const BookAuthor = require('../models/BookAuthor')
+const BookAuthor = require('../models/BookAuthor');
+const BookEntered = require('../models/BookEntered');
 
 const Book = database.define('book', {
     isbn_number: {

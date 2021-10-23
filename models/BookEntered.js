@@ -9,6 +9,7 @@ const BookEntered = database.define('book_entered', {
         type: UUIDV4,
         allowNull: false,
         primaryKey: true,
+        defaultValue: UUIDV4
     },
     book_isbn_number: {
         type: STRING(20),
@@ -34,11 +35,18 @@ const BookEntered = database.define('book_entered', {
     underscored: true
 })
 
-BookEntered.hasOne(Admin, {
-    foreignKey: 'id'
+BookEntered.belongsTo(Admin, {
+    foreignKey: 'created_by'
 })
+Admin.hasMany(BookEntered, {
+    foreignKey: 'created_by'
+})
+
 BookEntered.belongsTo(Book, {
-    foreignKey: 'book_isbn_number'
+    foreignKey: "book_isbn_number"
+})
+Book.hasMany(BookEntered, {
+    foreignKey: "book_isbn_number"
 })
 
 module.exports = BookEntered;

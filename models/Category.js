@@ -6,6 +6,7 @@ const Category = database.define('category', {
         type: UUIDV4,
         allowNull: false,
         primaryKey: true,
+        defaultValue: UUIDV4
     },
     name: {
         type: STRING(30),
@@ -20,9 +21,5 @@ const Category = database.define('category', {
     freezeTableName: true,
     timestamps: false
 })
-
-// Category.hasOne(Book, {
-//     foreignKey: 'category_id'
-// })
 
 module.exports = Category;

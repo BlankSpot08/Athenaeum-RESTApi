@@ -23,16 +23,6 @@ app.use('/admin', admin)
 app.use('/bookEntered', bookEntered)
 app.use('/book', book)
 
-// const Publisher = require('./models/Publisher')
-
-// Publisher.findAll({ raw: true })
-//     .then((publisher) => {
-//         console.log(publisher)
-//     })
-//     .catch(error => {
-//         console.log(`Error: ${error}`)
-//     })
-
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {

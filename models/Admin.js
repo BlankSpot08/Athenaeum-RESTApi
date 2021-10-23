@@ -7,7 +7,8 @@ const Admin = database.define('admin', {
     id: {
         type: STRING,
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
+        defaultValue: UUIDV4
     },
     password: {
         type: STRING(50),

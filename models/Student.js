@@ -46,7 +46,9 @@ const Student = database.define('student', {
     timestamps: false,
     hooks: {
         afterValidate: (student) => {
-            student.password = bcrypt.hashSync(student.password, 10)
+            if (student.password) {
+                student.password = bcrypt.hashSync(student.password, 10)
+            }
         }
     },
 })

@@ -41,7 +41,9 @@ const Admin = database.define('admin', {
     timestamps: false,
     hooks: {
         afterValidate: (admin) => {
-            admin.password = bcrypt.hashSync(admin.password, 10)
+            if (admin.password) {
+                admin.password = bcrypt.hashSync(admin.password, 10)
+            }
         }
     },
 })

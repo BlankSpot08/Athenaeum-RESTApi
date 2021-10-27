@@ -3,6 +3,11 @@ const bcrypt = require('bcrypt')
 
 const database = require('../config/database')
 
+const StudentBook = require('../models/StudentBook')
+const BorrowRequest = require('../models/BorrowRequest')
+const ReturnRequest = require('../models/ReturnRequest');
+const BookEntered = require('../models/BookEntered');
+
 const Student = database.define('student', {
     id: {
         type: STRING,
@@ -51,6 +56,27 @@ const Student = database.define('student', {
             }
         }
     },
+})
+
+BorrowRequest.belongsTo(Student, {
+    foreignKey: 'student_id'
+})
+Student.hasMany(BorrowRequest, {
+    foreignKey: 'student_id'
+})
+
+ReturnRequest.belongsTo(Student, {
+    foreignKey: 'student_id'
+})
+Student.hasMany(ReturnRequest, {
+    foreignKey: 'student_id'
+})
+
+StudentBook.belongsTo(Student, {
+    foreignKey: 'student_id',
+})
+Student.hasMany(StudentBook, {
+    foreignKey: 'student_id',
 })
 
 module.exports = Student;

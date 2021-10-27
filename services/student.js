@@ -1,21 +1,100 @@
 const Student = require('../models/Student')
+const Book = require('../models/Book')
+const Category = require('../models/Category')
+const Publisher = require('../models/Publisher')
+const Tag = require('../models/Tag')
+const Author = require('../models/Author')
+const BookEntered = require('../models/BookEntered')
+const BorrowRequest = require('../models/BorrowRequest')
+const ReturnRequest = require('../models/ReturnRequest')
 
 const token = require('../security/token')
 const jwtDecode = require('jwt-decode')
 const bcrypt = require('bcrypt')
 
 const StringTool = require('../helper/StringTool')
+const StudentBook = require('../models/StudentBook')
 
 require('dotenv').config()
 
+exports.getById = async (req, res) => {
+    const authHeader = req.headers['authorization']
+    let token
+    let studentInformation
+    if (authHeader) {
+        token = authHeader.split(' ')[1]
+        studentInformation = jwtDecode(token)
+    } else {
+        res.sendStatus(400)
+        return
+    }
 
-exports.getAllStudents = async (req, res) => {
-    const students = await Student.findAll({raw: true}, {
-        
+    const student = await Student.findByPk(studentInformation.id, {
+        include: [
+            {
+                model: BookEntered
+            },
+            {
+                model: BorrowRequest
+            },
+            {
+                model: ReturnRequest
+            },
+        ]
     })
 
+    if (student) {
+       return res.send(student)
+    }   
+
+    return res.status(400).json({
+        message: "Error"
+    })
+}
+
+exports.getAllStudents = async (req, res) => {
+    const students = await Student.findAll(
+        {
+            include: [
+                {
+                    model: StudentBook,
+                    include: [
+                        {
+                            model: BookEntered,
+                            include: [
+                                {
+                                    model: Book,
+                                    include: [
+                                        {
+                                            model: Category 
+                                        },
+                                        {
+                                            model: Publisher 
+                                        },
+                                        {
+                                            model: Tag 
+                                        },
+                                        {
+                                            model: Author 
+                                        },
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: BorrowRequest
+                },
+                {
+                    model: ReturnRequest
+                },
+            ]
+        }
+    )
+
     res.send(students)
-}   
+} 
 
 exports.login = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
@@ -48,11 +127,11 @@ exports.register = async (req, res) => {
             role: `student`,
         })
 
-        res.sendStatus(200)
+        res.status(200).json()
     } catch(error) {
         console.log(`Error: ${error}`)
         
-        res.sendStatus(400)
+        res.status(400).json
     } finally {
         return
     }
@@ -60,7 +139,7 @@ exports.register = async (req, res) => {
 
 exports.update = async (req, res) => {
     const authHeader = req.headers['authorization']
-    let token;
+    let token
     let studentInformation
     if (authHeader) {
         token = authHeader.split(' ')[1]
@@ -80,7 +159,7 @@ exports.update = async (req, res) => {
             balance: req.body.balance,
         }, {
             where: {
-                id: "dummy"
+                id: studentInformation.id
             }
         })
 
@@ -92,15 +171,4 @@ exports.update = async (req, res) => {
     } finally {
         return
     }
-}
-
-exports.getById = async (req, res) => {
-    const student = await Student.findByPk(req.body.id, { raw: true })
-
-    if (student) {
-        res.send(student)
-        return
-    }
-
-    res.sendStatus(400)
 }

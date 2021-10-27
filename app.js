@@ -13,6 +13,7 @@ const student = require('./controllers/student')
 const admin = require('./controllers/admin')
 const bookEntered = require('./controllers/bookEntered')
 const book = require('./controllers/book')
+const borrowRequest = require('./controllers/borrowRequest')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -22,6 +23,7 @@ app.use('/student', student)
 app.use('/admin', admin)
 app.use('/bookEntered', bookEntered)
 app.use('/book', book)
+app.use('/borrowRequest', borrowRequest)
 
 const PORT = process.env.PORT || 3000
 

@@ -1,8 +1,12 @@
 const { STRING, UUIDV4, DATE, TINYINT, SMALLINT } = require('sequelize');
+
 const database = require('../config/database')
 
 const Admin = require('../models/Admin')
 const Book = require('../models/Book')
+const StudentBook = require('../models/StudentBook')
+const BorrowRequest = require('../models/BorrowRequest')
+const ReturnRequest = require('../models/ReturnRequest')
 
 const BookEntered = database.define('book_entered', {
     id: {
@@ -47,6 +51,27 @@ BookEntered.belongsTo(Book, {
 })
 Book.hasMany(BookEntered, {
     foreignKey: "book_isbn_number"
+})
+
+BorrowRequest.belongsTo(BookEntered, {
+    foreignKey: 'book_entered_id'
+})
+BookEntered.hasMany(BorrowRequest, {
+    foreignKey: 'book_entered_id'
+})
+
+ReturnRequest.belongsTo(BookEntered, {
+    foreignKey: 'book_entered_id'
+})
+BookEntered.hasMany(ReturnRequest, {
+    foreignKey: 'book_entered_id'
+})
+
+StudentBook.belongsTo(BookEntered, {
+    foreignKey: 'book_entered_id',
+})
+BookEntered.hasMany(StudentBook, {
+    foreignKey: 'book_entered_id',
 })
 
 module.exports = BookEntered;

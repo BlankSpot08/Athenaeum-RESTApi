@@ -4,14 +4,13 @@ const Category = require('../models/Category')
 const Publisher = require('../models/Publisher')
 const Author = require('../models/Author')
 const BookEntered = require('../models/BookEntered')
+const BorrowRequest = require('../models/BorrowRequest')
+const StudentBook = require('../models/StudentBook')
 
 const jwtDecode = require('jwt-decode')
+const { response } = require('express')
 const Student = require('../models/Student')
-const { findByPk } = require('../models/Publisher')
-const BookAuthor = require('../models/BookAuthor')
-
-// const token = require('../security/token')
-// const bcrypt = require('bcrypt')
+const ReturnRequest = require('../models/ReturnRequest')
 
 exports.getAll = async (req, res) => {
     const books = await Book.findAll({
@@ -27,33 +26,69 @@ exports.getAll = async (req, res) => {
             }, 
             {
                 model: Author
-            }, {
+            }, 
+            {
                 model: BookEntered
             }
         ]
     })
 
-    res.send(books)
-    return
+    return res.status(200).json(books)
 }
 
 exports.getByPK = async (req, res) => {
     const book = await Book.findByPk(req.body.id, {
-        include: [{
-            model: Publisher
-        }, {
-            model: Category
-        }, {
-            model: Tag
-        }, {
-            model: Author
-        }]
+        include: [
+            {
+                model: Publisher
+            }, 
+            {
+                model: Category
+            }, 
+            {
+                model: Tag
+            }, 
+            {
+                model: Author
+            }
+        ]
     })
 
-    console.log(book)
+    if (!book) {
+        return res.status(400)
+    }
+    return res.status(200).json(book)
+}
 
-    res.send(book)
-    return
+exports.getTwentyBookByCategory = async (req, res) => {
+    const category = await Category.findOne({
+        where: {
+            name: req.body.category
+        }
+    })
+
+    const books = await Book.findAll({
+        where: {
+            category_id: category.id
+        },
+        include: [
+            {
+                model: Publisher
+            }, 
+            {
+                model: Category
+            }, 
+            {
+                model: Tag
+            }, 
+            {
+                model: Author
+            }
+        ],
+        limit: 20
+    })
+
+    res.status(200).json(books)
 }
 
 exports.register = async (req, res) => {
@@ -108,8 +143,6 @@ exports.register = async (req, res) => {
                 synopsis: req.body.synopsis,
                 price: req.body.price,
                 image_path: req.body.image_path,
-                // tag: req.body.tag,
-                // author: req.body.author
             }, {
                 raw: true
             })
@@ -169,12 +202,10 @@ exports.register = async (req, res) => {
             raw: true
         })
 
-        res.send(200)
+        return res.status(200)
     } catch(error) {
         console.log(`Error: ${error}`)
-        res.sendStatus(400)
-    } finally {
-        return
+        return res.status(400)
     }
 }
 
@@ -273,5 +304,160 @@ exports.update = async (req, res) => {
         book.addAuthor(author)
     }
 
-    res.sendStatus(200)
+    return response.status(200)
+}
+
+exports.borrowRequest = async (req, res) => {
+    const authHeader = req.headers['authorization']
+    let token
+    let studentInformation
+    if (authHeader) {
+        token = authHeader.split(' ')[1]
+        studentInformation = jwtDecode(token)
+    } else {
+        
+        return res.status(400).json({
+            message: "No Authentication"
+        })
+    }
+    
+    const bookEntered = await BookEntered.findOne({
+        where: {
+            book_isbn_number: req.body.isbn_number,
+            borrowed: 0
+        }
+    })
+
+    if (!bookEntered) {
+        return res.status(400).json({
+            message: "No more available book."
+        })
+    }
+
+    const borrowRequest = await BorrowRequest.create({
+        student_id: studentInformation.id,
+        book_entered_id: bookEntered.id,
+        date_requested: new Date
+    })
+
+    await bookEntered.update({
+        borrowed: 1
+    })
+
+    return res.status(200).json()
+}
+
+exports.acceptBorrowRequest = async (req, res) => {
+    const borrowRequest = await BorrowRequest.findOne({
+        where: {
+            student_id: req.body.student_id,
+            book_entered_id: req.body.book_entered_id
+        }
+    })
+
+    const date_return = new Date()
+    date_return.setDate(date_return.getDate() + 14)
+
+    const studentBook = await StudentBook.create({
+        student_id: borrowRequest.student_id,
+        book_entered_id: borrowRequest.book_entered_id,
+        date_requested: borrowRequest.date_requested,
+        date_acquired: new Date,
+        date_return: date_return
+    })
+
+    borrowRequest.destroy()
+
+    return res.status(200).json()
+}
+
+exports.rejectBorrowRequest = async (req, res) => {
+    const borrowRequest = await BorrowRequest.findOne({
+        where: {
+            student_id: req.body.student_id,
+            book_entered_id: req.body.book_entered_id
+        }
+    })
+
+    const bookEntered = await BookEntered.update({
+        borrowed: 0
+    }, {
+        where: {
+            id: borrowRequest.book_entered_id
+        }
+    })
+
+    borrowRequest.destroy()
+
+    return res.status(200).json()
+}
+
+exports.returnRequest = async (req, res) => {
+    const authHeader = req.headers['authorization']
+    let token
+    let studentInformation
+    if (authHeader) {
+        token = authHeader.split(' ')[1]
+        studentInformation = jwtDecode(token)
+    } else {
+        return res.status(400).json({
+            message: "No Authentication"
+        })
+    }
+
+    const studentBook = await StudentBook.findOne({
+        where: {
+            student_id: studentInformation.id,
+            book_entered_id: req.body.book_entered_id
+        }
+    })
+
+    const returnRequest = await ReturnRequest.create({
+        student_id: studentInformation.id,
+        book_entered_id: studentBook.book_entered_id,
+        date_requested: new Date
+    })
+
+    res.status(200).json()
+}
+
+exports.acceptReturnRequest = async (req, res) => {
+    const returnRequest = await ReturnRequest.findOne({
+        where: {
+            student_id: req.body.student_id,
+            book_entered_id: req.body.book_entered_id
+        }
+    })
+
+    const bookEntered = await BookEntered.update({
+        borrowed: 0
+    }, {
+        where: {
+            id: returnRequest.book_entered_id
+        }
+    })
+
+    const studentBook = await StudentBook.destroy({
+        where: {
+            student_id: returnRequest.student_id,
+            book_entered_id: returnRequest.book_entered_id
+        }
+    })
+
+    returnRequest.destroy()
+
+    res.status(200).json()
+}
+
+exports.rejectReturnRequest = async (req, res) => {
+    const returnRequest = await ReturnRequest.findOne({
+        where: {
+            student_id: req.body.student_id,
+            book_entered_id: req.body.book_entered_id
+        }
+    })
+
+    returnRequest.destroy()
+
+    res.status(200).json()
 }

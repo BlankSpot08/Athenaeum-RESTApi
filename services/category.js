@@ -2,15 +2,17 @@ const database = require('../config/database')
 
 const Category = require('../models/Category')
 
-exports.getAllCategories = (req, res) => {
+exports.getAllCategories = async (req, res) => {
     Category.findAll()
         .then(value => {
             console.log(value)
-            res.sendStatus(value)
+            return res.sendStatus(value)
         })
         .catch(error => console.log(`Error: ${error}`))
-    res.send(402)
-    return
+
+    const category = await  Category.findAll()
+
+    return res.status(200).json(category)
 }
 
 exports.getByTitle = async (req, res) => {
@@ -19,7 +21,9 @@ exports.getByTitle = async (req, res) => {
             name: req.body.name
         }
     })
-    console.log(category)
 
-    res.send(200)
+    if (category) {
+        return res.status(200).json(category)
+    }
+    return res.status(400).json()
 }

@@ -29,5 +29,5 @@ exports.getAll = async (req, res) => {
         ]
     }) 
     
-    res.send(bookEntered)
+    res.status(200).json(bookEntered)
 }

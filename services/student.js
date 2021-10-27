@@ -104,12 +104,13 @@ exports.login = async (req, res) => {
     if (student && student.password.localeCompare(hashedPassword)) {
         const accessToken = token.generateAccessToken(student.id, student.role)
 
-        res.send({ accessToken: accessToken })
+        res.status(200).json({ accessToken: accessToken })
         return
     }
 
-    res.sendStatus(400)
-    return
+    return res.status(400).json({
+        message: "Login failed"
+    })
 }
 
 exports.register = async (req, res) => {
@@ -127,14 +128,12 @@ exports.register = async (req, res) => {
             role: `student`,
         })
 
-        res.status(200).json()
+        return res.status(200).json()
     } catch(error) {
         console.log(`Error: ${error}`)
         
-        res.status(400).json
-    } finally {
-        return
-    }
+        return res.status(400).json()
+    } 
 }
 
 exports.update = async (req, res) => {
@@ -145,8 +144,7 @@ exports.update = async (req, res) => {
         token = authHeader.split(' ')[1]
         studentInformation = jwtDecode(token)
     } else {
-        res.sendStatus(400)
-        return
+        return res.status(400).json()
     }
     
     try {
@@ -163,12 +161,10 @@ exports.update = async (req, res) => {
             }
         })
 
-        res.sendStatus(200)
+        return res.status(200).json()
     } catch (error) {
         console.log(`Error: ${error}`)
 
-        res.sendStatus(400)
-    } finally {
-        return
+        res.status(400).json()
     }
 }

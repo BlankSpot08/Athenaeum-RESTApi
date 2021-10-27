@@ -16,8 +16,8 @@ exports.getAllBorrowRequest = async (req, res) => {
         ]
     })
 
-    res.send(borrowRequests)
-    return
+    
+    return res.status(200).json(borrowRequests)
 }
 
 exports.getById  = async (req, res) => {
@@ -28,16 +28,18 @@ exports.getById  = async (req, res) => {
         token = authHeader.split(' ')[1]
         studentInformation = jwtDecode(token)
     } else {
-        res.sendStatus(400)
-        return
+        return res.status(400).json()
     }
 
-    const borrowRequests = await BorrowRequest.findAll({
+    const borrowRequests = await BorrowRequest.findOne({
         where: {
             student_id: studentInformation.id
         }
     })
 
-    res.send(borrowRequests)
-    return
+    if (borrowRequests) {
+        return res.status(200).json(borrowRequests)
+    }
+
+    return res.status(400).json()
 }

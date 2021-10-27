@@ -91,6 +91,36 @@ exports.getTwentyBookByCategory = async (req, res) => {
     res.status(200).json(books)
 }
 
+exports.getAllByCategory = async (req, res) => {
+    const category = await Category.findOne({
+        where: {
+            name: req.body.category
+        }
+    })
+
+    const books = await Book.findAll({
+        where: {
+            category_id: category.id
+        },
+        include: [
+            {
+                model: Publisher
+            }, 
+            {
+                model: Category
+            }, 
+            {
+                model: Tag
+            }, 
+            {
+                model: Author
+            }
+        ]
+    })
+
+    res.status(200).json(books)
+}
+
 exports.register = async (req, res) => {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]

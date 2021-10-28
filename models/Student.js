@@ -6,7 +6,8 @@ const database = require('../config/database')
 const StudentBook = require('../models/StudentBook')
 const BorrowRequest = require('../models/BorrowRequest')
 const ReturnRequest = require('../models/ReturnRequest');
-const BookEntered = require('../models/BookEntered');
+const StudentBookList = require('../models/StudentBookList');
+const StudentReadAgain = require('../models/StudentReadAgain');
 
 const Student = database.define('student', {
     id: {
@@ -77,6 +78,20 @@ StudentBook.belongsTo(Student, {
 })
 Student.hasMany(StudentBook, {
     foreignKey: 'student_id',
+})
+
+StudentBookList.belongsTo(Student, {
+    foreignKey: 'student_id'
+})
+Student.hasMany(StudentBookList, {
+    foreignKey: 'student_id'
+})
+
+StudentReadAgain.belongsTo(Student, {
+    foreignKey: 'student_id'
+})
+Student.hasMany(StudentReadAgain, {
+    foreignKey: 'student_id'
 })
 
 module.exports = Student;

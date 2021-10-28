@@ -1,8 +1,6 @@
-const database = require('../config/database')
-
 const Category = require('../models/Category')
 
-exports.getAllCategories = async (req, res) => {
+exports.getAll = async (req, res) => {
     Category.findAll()
         .then(value => {
             console.log(value)

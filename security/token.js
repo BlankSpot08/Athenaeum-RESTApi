@@ -6,22 +6,42 @@ exports.generateAccessToken = (id, role) => {
     return jwt.sign({id: id, role: role}, process.env.ACCESS_TOKEN_SECRET);
 }
 
-exports.authenticateToken = (req, res, next) => {
-    console.log('sad')
-    next('route')
-    //  const authHeader = req.headers['authorization']
-    //  const token = authHeader && authHeader.split(' ')[1]
+authenticateRoleToken = (req, res, next, role) => {
+     const authHeader = req.headers['authorization']
+     const token = authHeader && authHeader.split(' ')[1]
 
-    //  if (token == null) {
-    //      res.sendStatus(401)
-    //  }
+     if (token == null) {
+        return res.status(401).json({
+            message: "Token is null"
+        })
+     }
 
-    //  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    //      if (err) {
-    //         res.sendStatus(403)
-    //      }
+     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+         if (err) {
+            return res.status(403).json({
+                message: err
+            })
+         }
 
-    //      req.user = user
-    //      next()
-    //  })
+         if (user.role.localeCompare(role)) {
+            return res.status(403).json({
+                message: "Authorization failed"
+            })
+         }
+
+         req.user = user
+         next()
+     })
+}
+
+exports.authenticateStudentToken = (req, res, next) => {
+    const role = 'student'
+
+    authenticateRoleToken(req, res, next, role)
+}
+
+exports.authenticateAdminToken = (req, res, next) => {
+    const role = 'admin'
+
+    authenticateRoleToken(req, res, next, role)
 }

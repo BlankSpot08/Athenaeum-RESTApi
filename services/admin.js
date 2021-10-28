@@ -1,5 +1,6 @@
 const Admin = require('../models/Admin')
 
+const jwtDecode = require('jwt-decode')
 const token = require('../security/token')
 const bcrypt = require('bcrypt')
 

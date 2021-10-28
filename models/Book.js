@@ -7,6 +7,8 @@ const Tag = require('../models/Tag')
 const BookTag = require('../models/BookTag')
 const Author = require('../models/Author')
 const BookAuthor = require('../models/BookAuthor');
+const StudentBookList = require('../models/StudentBookList');
+const StudentReadAgain = require('../models/StudentReadAgain');
 
 const Book = database.define('book', {
     isbn_number: {
@@ -97,5 +99,19 @@ Author.belongsToMany(Book, {
 })
 BookAuthor.belongsTo(Book)
 BookAuthor.belongsTo(Author)
+
+Book.hasMany(StudentBookList, {
+    foreignKey: 'book_isbn_number'
+})
+StudentBookList.belongsTo(Book, {
+    foreignKey: 'book_isbn_number'
+})
+
+Book.hasMany(StudentReadAgain, {
+    foreignKey: 'book_isbn_number'
+})
+StudentReadAgain.belongsTo(Book, {
+    foreignKey: 'book_isbn_number'
+})
 
 module.exports = Book;

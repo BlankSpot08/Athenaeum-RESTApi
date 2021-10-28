@@ -7,13 +7,11 @@ const Author = require('../models/Author')
 const BookEntered = require('../models/BookEntered')
 const BorrowRequest = require('../models/BorrowRequest')
 const ReturnRequest = require('../models/ReturnRequest')
+const StudentBook = require('../models/StudentBook')
 
-const token = require('../security/token')
 const jwtDecode = require('jwt-decode')
 const bcrypt = require('bcrypt')
-
-const StringTool = require('../helper/StringTool')
-const StudentBook = require('../models/StudentBook')
+const stringTool = require('../helper/stringTool')
 
 require('dotenv').config()
 
@@ -93,7 +91,7 @@ exports.getAllStudents = async (req, res) => {
         }
     )
 
-    res.send(students)
+    return res.status(200).json(students)
 } 
 
 exports.login = async (req, res) => {
@@ -104,8 +102,7 @@ exports.login = async (req, res) => {
     if (student && student.password.localeCompare(hashedPassword)) {
         const accessToken = token.generateAccessToken(student.id, student.role)
 
-        res.status(200).json({ accessToken: accessToken })
-        return
+        return res.status(200).json({ accessToken: accessToken })
     }
 
     return res.status(400).json({
@@ -118,9 +115,9 @@ exports.register = async (req, res) => {
         const student = await Student.create({
             id: req.body.id,
             password: req.body.password,
-            firstname: StringTool.capitalize(req.body.firstname),
-            middlename: StringTool.capitalize(req.body.middlename),
-            lastname: StringTool.capitalize(req.body.lastname),
+            firstname: stringTool.capitalize(req.body.firstname),
+            middlename: stringTool.capitalize(req.body.middlename),
+            lastname: stringTool.capitalize(req.body.lastname),
             emailaddress: req.body.emailaddress,
             contactno: req.body.contactno,
             guardiancontactno: req.body.guardiancontactno,
@@ -149,9 +146,9 @@ exports.update = async (req, res) => {
     
     try {
         const student = await Student.update({
-            firstname: StringTool.capitalize(req.body.firstname),
-            middlename: StringTool.capitalize(req.body.middlename),
-            lastname: StringTool.capitalize(req.body.lastname),
+            firstname: stringTool.capitalize(req.body.firstname),
+            middlename: stringTool.capitalize(req.body.middlename),
+            lastname: stringTool.capitalize(req.body.lastname),
             contactno: req.body.contactno,
             guardiancontactno: req.body.guardiancontactno,
             balance: req.body.balance,

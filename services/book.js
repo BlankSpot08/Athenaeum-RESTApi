@@ -5,12 +5,9 @@ const Publisher = require('../models/Publisher')
 const Author = require('../models/Author')
 const BookEntered = require('../models/BookEntered')
 const BorrowRequest = require('../models/BorrowRequest')
-const StudentBook = require('../models/StudentBook')
 
 const jwtDecode = require('jwt-decode')
 const { response } = require('express')
-const Student = require('../models/Student')
-const ReturnRequest = require('../models/ReturnRequest')
 
 exports.getAll = async (req, res) => {
     const books = await Book.findAll({
@@ -375,119 +372,4 @@ exports.borrowRequest = async (req, res) => {
     })
 
     return res.status(200).json()
-}
-
-exports.acceptBorrowRequest = async (req, res) => {
-    const borrowRequest = await BorrowRequest.findOne({
-        where: {
-            student_id: req.body.student_id,
-            book_entered_id: req.body.book_entered_id
-        }
-    })
-
-    const date_return = new Date()
-    date_return.setDate(date_return.getDate() + 14)
-
-    const studentBook = await StudentBook.create({
-        student_id: borrowRequest.student_id,
-        book_entered_id: borrowRequest.book_entered_id,
-        date_requested: borrowRequest.date_requested,
-        date_acquired: new Date,
-        date_return: date_return
-    })
-
-    borrowRequest.destroy()
-
-    return res.status(200).json()
-}
-
-exports.rejectBorrowRequest = async (req, res) => {
-    const borrowRequest = await BorrowRequest.findOne({
-        where: {
-            student_id: req.body.student_id,
-            book_entered_id: req.body.book_entered_id
-        }
-    })
-
-    const bookEntered = await BookEntered.update({
-        borrowed: 0
-    }, {
-        where: {
-            id: borrowRequest.book_entered_id
-        }
-    })
-
-    borrowRequest.destroy()
-
-    return res.status(200).json()
-}
-
-exports.returnRequest = async (req, res) => {
-    const authHeader = req.headers['authorization']
-    let token
-    let studentInformation
-    if (authHeader) {
-        token = authHeader.split(' ')[1]
-        studentInformation = jwtDecode(token)
-    } else {
-        return res.status(400).json({
-            message: "No Authentication"
-        })
-    }
-
-    const studentBook = await StudentBook.findOne({
-        where: {
-            student_id: studentInformation.id,
-            book_entered_id: req.body.book_entered_id
-        }
-    })
-
-    const returnRequest = await ReturnRequest.create({
-        student_id: studentInformation.id,
-        book_entered_id: studentBook.book_entered_id,
-        date_requested: new Date
-    })
-
-    res.status(200).json()
-}
-
-exports.acceptReturnRequest = async (req, res) => {
-    const returnRequest = await ReturnRequest.findOne({
-        where: {
-            student_id: req.body.student_id,
-            book_entered_id: req.body.book_entered_id
-        }
-    })
-
-    const bookEntered = await BookEntered.update({
-        borrowed: 0
-    }, {
-        where: {
-            id: returnRequest.book_entered_id
-        }
-    })
-
-    const studentBook = await StudentBook.destroy({
-        where: {
-            student_id: returnRequest.student_id,
-            book_entered_id: returnRequest.book_entered_id
-        }
-    })
-
-    returnRequest.destroy()
-
-    res.status(200).json()
-}
-
-exports.rejectReturnRequest = async (req, res) => {
-    const returnRequest = await ReturnRequest.findOne({
-        where: {
-            student_id: req.body.student_id,
-            book_entered_id: req.body.book_entered_id
-        }
-    })
-
-    returnRequest.destroy()
-
-    res.status(200).json()
 }

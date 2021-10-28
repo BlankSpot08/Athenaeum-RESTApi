@@ -15,12 +15,14 @@ const bookEntered = require('./controllers/bookEntered')
 const book = require('./controllers/book')
 const borrowRequest = require('./controllers/borrowRequest')
 
+const security = require('./security/token')
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use('/category', category)
-app.use('/student', student)
-app.use('/admin', admin)
+app.use('/student', security.authenticateStudentToken, student)
+app.use('/admin', security.authenticateAdminToken, admin)
 app.use('/bookEntered', bookEntered)
 app.use('/book', book)
 app.use('/borrowRequest', borrowRequest)

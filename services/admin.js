@@ -12,15 +12,11 @@ exports.getAllAdmins = async (req, res) => {
 
 exports.getByID = async (req, res) => {
     const authHeader = req.headers['authorization']
-    let token
     let adminInformation
-    if (authHeader) {
-        token = authHeader.split(' ')[1]
-        adminInformation = jwtDecode(token)
-    } else {
-        res.sendStatus(400)
-        return
-    }
+    let token
+
+    token = authHeader.split(' ')[1]
+    adminInformation = jwtDecode(token)
 
     const admin = await Admin.findByPk(adminInformation.id, { raw: true })
 
@@ -61,4 +57,55 @@ exports.login = async (req, res) => {
     return res.status(400).json({
         message: "login failed"
     })
+}
+
+updateInformation = async (req, res, column, newValue) => {
+    const authHeader = req.headers['authorization']
+    let token
+    let adminInformation
+
+    token = authHeader.split(' ')[1]
+    adminInformation = jwtDecode(token)
+    
+    try {
+        const admin = await Admin.update({
+            [column]: newValue
+        }, {
+            where: {
+                id: adminInformation.id
+            }
+        })
+
+        const temp = await Admin.findByPk(adminInformation.id)
+
+        return res.status(200).json(temp)
+    } catch (error) {
+        console.log(`Error: ${error}`)
+
+        res.status(400).json()
+    }
+}
+
+exports.updateFirstname = async (req, res) => {
+    return updateInformation(req, res, 'firstname', stringTool.capitalize(req.body.firstname))
+}
+
+exports.updateMiddlename = async (req, res) => {
+    return updateInformation(req, res, 'middlename', stringTool.capitalize(req.body.middlename))
+}
+
+exports.updateLastname = async (req, res) => {
+    return updateInformation(req, res, 'lastname', stringTool.capitalize(req.body.lastname))
+}
+
+exports.updateContactNo = async (req, res) => {
+    return updateInformation(req, res, 'contactno', req.body.contactno)
+}
+
+exports.updateProfilePicture = async (req, res) => {
+    return updateInformation(req, res, 'image_path', req.body.image_path)
+}
+
+exports.updatePassword = async (req, res) => {
+    return updateInformation(req, res, 'password', req.body.password)
 }

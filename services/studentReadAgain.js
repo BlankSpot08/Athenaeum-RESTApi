@@ -5,16 +5,11 @@ const Book = require('../models/Book')
 
 exports.getAllOfStudent = async (req, res) => {
     const authHeader = req.headers['authorization']
-    let token
     let studentInformation
-    if (authHeader) {
-        token = authHeader.split(' ')[1]
-        studentInformation = jwtDecode(token)
-    } else {
-        return res.status(400).json({
-            message: "No Authentication"
-        })
-    }
+    let token
+
+    token = authHeader.split(' ')[1]
+    studentInformation = jwtDecode(token)
 
     const studentReadAgain = await StudentReadAgain.findAll({
         where: {

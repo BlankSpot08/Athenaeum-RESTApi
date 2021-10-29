@@ -5,6 +5,7 @@ const admin = require('../services/admin')
 const book = require('../services/book')
 const borrowRequest = require('../services/borrowRequest')
 const returnRequest = require('../services/returnRequest')
+const imageUploader = require('../helper/imageUploader')
 
 router.get('/get', admin.getByID)
 router.get('/getAll', admin.getAllAdmins)
@@ -12,13 +13,21 @@ router.get('/getAll', admin.getAllAdmins)
 router.get('/login', admin.login)
 router.post('/register', admin.register)
 
+router.put('/updateFirstname', admin.updateFirstname)
+router.put('/updateMiddlename', admin.updateMiddlename)
+router.put('/updateLastname', admin.updateLastname)
+router.put('/updateContactNo', admin.updateContactNo)
+
+router.put('/updateProfilePicture', imageUploader.upload.single('image'), admin.updateProfilePicture)
+router.put('/updatePassword', admin.updatePassword)
+
 router.post('/acceptBorrowRequest', borrowRequest.acceptBorrowRequest)
 router.post('/rejectBorrowRequest', borrowRequest.rejectBorrowRequest)      
 
 router.post('/acceptReturnRequest', returnRequest.acceptReturnRequest)
 router.post('/rejectReturnRequest', returnRequest.rejectReturnRequest)
 
-router.post('/bookRegister', book.register)
-router.put('/update', book.update)
+router.post('/bookRegister', imageUploader.upload.single('image'), book.register)
+router.put('/bookUpdate', book.update)
 
 module.exports = router

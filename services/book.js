@@ -336,17 +336,11 @@ exports.update = async (req, res) => {
 
 exports.borrowRequest = async (req, res) => {
     const authHeader = req.headers['authorization']
-    let token
     let studentInformation
-    if (authHeader) {
-        token = authHeader.split(' ')[1]
-        studentInformation = jwtDecode(token)
-    } else {
-        
-        return res.status(400).json({
-            message: "No Authentication"
-        })
-    }
+    let token
+    
+    token = authHeader.split(' ')[1]
+    studentInformation = jwtDecode(token)
     
     const bookEntered = await BookEntered.findOne({
         where: {

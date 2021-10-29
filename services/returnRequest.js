@@ -23,14 +23,11 @@ exports.getAll = async (req, res) => {
 
 exports.getById  = async (req, res) => {
     const authHeader = req.headers['authorization']
-    let token
     let studentInformation
-    if (authHeader) {
-        token = authHeader.split(' ')[1]
-        studentInformation = jwtDecode(token)
-    } else {
-        return res.status(400).json()
-    }
+    let token
+
+    token = authHeader.split(' ')[1]
+    studentInformation = jwtDecode(token)
 
     const returnRequest = await ReturnRequest.findOne({
         where: {

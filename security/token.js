@@ -17,31 +17,34 @@ authenticateRoleToken = (req, res, next, role) => {
      }
 
      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-         if (err) {
+        if (err) {
             return res.status(403).json({
                 message: err
             })
-         }
+        }
 
-         if (user.role.localeCompare(role)) {
-            return res.status(403).json({
-                message: "Authorization failed"
-            })
-         }
+        let i = 0
+        for (i = 0; i < role.length; i++) {
+            if (user.role.localeCompare(role[i])) {
+                req.user = user
+                return next()
+            }
+        }
 
-         req.user = user
-         next()
+        return res.status(403).json({
+            message: "Authorization failed"
+        })
      })
 }
 
-exports.authenticateStudentToken = (req, res, next) => {
-    const role = 'student'
+exports.authenticateStudentAuthorization = (req, res, next) => {
+    const role = ['student', 'admin']
 
-    authenticateRoleToken(req, res, next, role)
+    return authenticateRoleToken(req, res, next, role)
 }
 
-exports.authenticateAdminToken = (req, res, next) => {
-    const role = 'admin'
+exports.authenticateAdminAuthorization = (req, res, next) => {
+    const role = ['admin']
 
-    authenticateRoleToken(req, res, next, role)
+    return authenticateRoleToken(req, res, next, role)
 }

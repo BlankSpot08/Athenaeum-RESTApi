@@ -23,9 +23,6 @@ exports.getAll = async (req, res) => {
             }, 
             {
                 model: Author
-            }, 
-            {
-                model: BookEntered
             }
         ]
     })
@@ -366,4 +363,8 @@ exports.borrowRequest = async (req, res) => {
     })
 
     return res.status(200).json()
+}
+
+exports.search = async (req, res) => {
+    
 }

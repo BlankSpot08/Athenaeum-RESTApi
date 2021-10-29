@@ -27,22 +27,6 @@ exports.getByID = async (req, res) => {
     return res.status(400).json()
 }
 
-exports.register = (req, res) => {
-    Admin.create({
-        id: req.body.id,
-        password: req.body.password,
-        firstname: req.body.firstname,
-        middlename: req.body.middlename,
-        lastname: req.body.lastname,
-        emailaddress: req.body.emailaddress,
-        contactno: req.body.contactno,
-        balance: `0`,
-        role: `admin`,
-    })
-
-    return res.status(200).json()
-}
-
 exports.login = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
 

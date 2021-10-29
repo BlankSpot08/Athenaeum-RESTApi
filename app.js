@@ -14,6 +14,7 @@ const admin = require('./controllers/admin')
 const bookEntered = require('./controllers/bookEntered')
 const book = require('./controllers/book')
 const borrowRequest = require('./controllers/borrowRequest')
+const adminRequest = require('./controllers/adminRequest')
 const image = require('./controllers/image')
 
 const security = require('./security/token')

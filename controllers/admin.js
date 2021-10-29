@@ -3,6 +3,7 @@ router = express.Router()
 
 const admin = require('../services/admin')
 const book = require('../services/book')
+const adminRequest = require('../services/adminRequest')
 const borrowRequest = require('../services/borrowRequest')
 const returnRequest = require('../services/returnRequest')
 const imageUploader = require('../helper/imageUploader')
@@ -11,7 +12,9 @@ router.get('/get', admin.getByID)
 router.get('/getAll', admin.getAllAdmins)
 
 router.get('/login', admin.login)
-router.post('/register', admin.register)
+
+router.put('/acceptAdminRequest', adminRequest.acceptRegistration)
+router.put('/rejectAdminRequest', adminRequest.rejectRegistration)
 
 router.put('/updateFirstname', admin.updateFirstname)
 router.put('/updateMiddlename', admin.updateMiddlename)

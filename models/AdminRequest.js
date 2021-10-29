@@ -3,7 +3,7 @@ const database = require('../config/database')
 
 const bcrypt = require('bcrypt')
 
-const Admin = database.define('admin', {
+const AdminRequest = database.define('admin_request', {
     id: {
         type: STRING,
         allowNull: false,
@@ -38,7 +38,14 @@ const Admin = database.define('admin', {
     }
 }, {
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
+    hooks: {
+        afterValidate: (admin_request) => {
+            if (admin_request.password) {
+                admin_request.password = bcrypt.hashSync(admin_request.password, 10)
+            }
+        }
+    },
 })
 
-module.exports = Admin;
+module.exports = AdminRequest;

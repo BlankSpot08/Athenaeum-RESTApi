@@ -23,7 +23,9 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/student', security.authenticateStudentAuthorization, student)
 app.use('/admin', security.authenticateAdminAuthorization, admin)
+
 app.use('/authentication', authentication)
+app.use('/registration', registration)
 app.use('/category', category)
 app.use('/book', book)
 

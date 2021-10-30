@@ -1,3 +1,6 @@
 const { Sequelize } = require('sequelize');
+require('dotenv').config()
 
-module.exports = new Sequelize('postgres://postgres:bh2236@localhost:5432/athenaeum')
+module.exports = new Sequelize(
+        `${process.env.DB_CONNECTION}://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`
+    )

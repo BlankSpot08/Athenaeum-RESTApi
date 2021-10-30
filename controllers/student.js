@@ -11,9 +11,6 @@ const imageUploader = require('../helper/imageUploader')
 router.get('/get', student.getById)
 router.get('/getAll', student.getAllStudents)
 
-router.get('/login', student.login)
-router.post('/register', student.register)
-
 router.put('/updateFirstname', student.updateFirstname)
 router.put('/updateMiddlename', student.updateMiddlename)
 router.put('/updateLastname', student.updateLastname)

@@ -3,9 +3,9 @@ const { STRING, UUIDV4  } = require('sequelize');
 const database = require('../config/database')
 
 const BookAuthor = database.define('book_author', {
-    book_isbn_number: {
-        type: STRING(20),
-        allowNull: UUIDV4,
+    book_id: {
+        type: UUIDV4,
+        allowNull: false,
         primaryKey: true,
         foreignKey: true
     },

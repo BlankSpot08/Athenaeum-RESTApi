@@ -9,8 +9,8 @@ const StudentBookList = database.define('student_booklist', {
         primaryKey: true,
         foreignKey: true
     },
-    book_isbn_number: {
-        type: STRING(20),
+    book_id: {
+        type: UUIDV4,
         allowNull: false,
         primaryKey: true,
         foreignKey: true

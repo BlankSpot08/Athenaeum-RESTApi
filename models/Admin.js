@@ -35,10 +35,20 @@ const Admin = database.define('admin', {
     },
     role: {
         type: STRING(16),
+    },
+    image_path: {
+        type: STRING(255)
     }
 }, {
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
+    hooks: {
+        afterValidate: (admin_request) => {
+            if (admin_request.password) {
+                admin_request.password = bcrypt.hashSync(admin_request.password, 10)
+            }
+        }
+    },
 })
 
 module.exports = Admin;

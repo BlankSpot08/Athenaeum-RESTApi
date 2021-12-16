@@ -1,6 +1,7 @@
 const express = require('express')
 router = express.Router()
 
+const student = require('../services/student')
 const admin = require('../services/admin')
 const book = require('../services/book')
 const adminRequest = require('../services/adminRequest')
@@ -9,12 +10,17 @@ const returnRequest = require('../services/returnRequest')
 const imageUploader = require('../helper/imageUploader')
 
 router.get('/get', admin.getByID)
-router.get('/getAll', admin.getAllAdmins)
+router.get('/getAllAdmins', admin.getAllAdmins)
+router.get('/getAllStudents', student.getAllStudents)
 
 router.get('/login', admin.login)
 
-router.put('/acceptAdminRequest', adminRequest.acceptRegistration)
-router.put('/rejectAdminRequest', adminRequest.rejectRegistration)
+router.post('/studentSearch', student.search)
+router.put('/studentPay', student.pay)
+
+router.get('/getAllAdminRequests', adminRequest.getAll)
+router.post('/acceptAdminRequest', adminRequest.acceptRegistration)
+router.delete('/rejectAdminRequest', adminRequest.rejectRegistration)
 
 router.put('/updateFirstname', admin.updateFirstname)
 router.put('/updateMiddlename', admin.updateMiddlename)
@@ -24,13 +30,22 @@ router.put('/updateContactNo', admin.updateContactNo)
 router.put('/updateProfilePicture', imageUploader.upload.single('image'), admin.updateProfilePicture)
 router.put('/updatePassword', admin.updatePassword)
 
+router.get('/getAllBorrowRequests', borrowRequest.getAll)
+router.post('/borrowRequestSearch', borrowRequest.search)
 router.post('/acceptBorrowRequest', borrowRequest.acceptBorrowRequest)
-router.post('/rejectBorrowRequest', borrowRequest.rejectBorrowRequest)      
+router.delete('/rejectBorrowRequest', borrowRequest.rejectBorrowRequest)
 
+router.get('/getAllReturnRequests', returnRequest.getAll)
+router.post('/returnRequestSearch', returnRequest.search)
 router.post('/acceptReturnRequest', returnRequest.acceptReturnRequest)
-router.post('/rejectReturnRequest', returnRequest.rejectReturnRequest)
+router.delete('/rejectReturnRequest', returnRequest.rejectReturnRequest)
 
+router.get('/getAllBooks', book.getAll)
+router.post('/getBook', book.getByISBN)
+router.post('/bookSearch', book.microSearch)
 router.post('/bookRegister', imageUploader.upload.single('image'), book.register)
-router.put('/bookUpdate', book.update)
+router.put('/bookUpdate', imageUploader.upload.single('image'), book.update)
+
+router.post('/authorize', admin.authorizeToken)
 
 module.exports = router

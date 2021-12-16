@@ -31,3 +31,17 @@ exports.getAll = async (req, res) => {
     
     res.status(200).json(bookEntered)
 }
+
+
+exports.getTotalAvailable = async (req, res) => {
+    const totalCount = await BookEntered.count({where: {
+        book_id: req.body.book_id,
+    }})
+
+    const notBorrowedCount = await BookEntered.count({where: {
+        book_id: req.body.book_id,
+        borrowed: 0
+    }})
+    
+    res.status(200).json({total: totalCount, borrowed: notBorrowedCount})
+}

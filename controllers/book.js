@@ -2,12 +2,12 @@ const express = require('express')
 router = express.Router()
 
 const book = require('../services/book')
- 
-router.get('/get', book.getByPK)
+const student = require('../services/student')
+
+router.post('/get', book.getByISBN)
 router.get('/getAll', book.getAll)
 
-router.get('/getTwentyBookByCategory', book.getTwentyBookByCategory)
-router.get('/getAllByCategory', book.getAllByCategory)
-
+router.post('/getTwentyBookByCategory', book.getTwentyBookByCategory)
+router.post('/getAllByCategory', book.getAllByCategory)
 
 module.exports = router

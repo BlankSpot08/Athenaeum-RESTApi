@@ -1,13 +1,7 @@
 const Category = require('../models/Category')
 
-exports.getAll = async (req, res) => {
-    const category = await  Category.findAll()
-
-    return res.status(200).json(category)
-}
-
 exports.getByTitle = async (req, res) => {
-    const category = await Catsegory.findOne({
+    const category = await Category.findOne({
         where: {
             name: req.body.name
         }
@@ -16,5 +10,13 @@ exports.getByTitle = async (req, res) => {
     if (category) {
         return res.status(200).json(category)
     }
+
     return res.status(400).json()
 }
+
+exports.getAll = async (req, res) => {
+    const category = await  Category.findAll()
+
+    return res.status(200).json(category)
+}
+

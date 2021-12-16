@@ -15,10 +15,10 @@ const BookEntered = database.define('book_entered', {
         primaryKey: true,
         defaultValue: UUIDV4
     },
-    book_isbn_number: {
-        type: STRING(20),
+    book_id: {
+        type: UUIDV4,
         allowNull: false,
-        foreignKey: true
+        primaryKey: true,
     },
     date_created: {
         type: DATE,
@@ -47,10 +47,10 @@ Admin.hasMany(BookEntered, {
 })
 
 BookEntered.belongsTo(Book, {
-    foreignKey: "book_isbn_number"
+    foreignKey: "book_id"
 })
 Book.hasMany(BookEntered, {
-    foreignKey: "book_isbn_number"
+    foreignKey: "book_id"
 })
 
 BorrowRequest.belongsTo(BookEntered, {

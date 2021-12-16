@@ -5,52 +5,175 @@ const Publisher = require('../models/Publisher')
 const Author = require('../models/Author')
 const BookEntered = require('../models/BookEntered')
 const BorrowRequest = require('../models/BorrowRequest')
+const { Op } = require("sequelize")
 
 const jwtDecode = require('jwt-decode')
-const { response } = require('express')
+const BookAuthor = require('../models/BookAuthor')
 
 exports.getAll = async (req, res) => {
     const books = await Book.findAll({
         include: [
             {
                 model: Publisher
-            }, 
+            },
             {
                 model: Category
-            }, 
+            },
             {
                 model: Tag
-            }, 
+            },
             {
                 model: Author
             }
-        ]
+        ],
     })
 
     return res.status(200).json(books)
 }
 
-exports.getByPK = async (req, res) => {
-    const book = await Book.findByPk(req.body.id, {
+exports.microSearch = async (req, res) => {
+    const isbn = req.body.isbn.toLowerCase()
+    const title = req.body.title.toLowerCase()
+    const authorName = req.body.author_name.toLowerCase()
+    const publisherName = req.body.publisher_name.toLowerCase()
+    const category = req.body.category.toLowerCase()
+
+    const books = await Book.findAll({
         include: [
             {
-                model: Publisher
-            }, 
+                model: Category,
+                as: 'category'
+            },
             {
-                model: Category
-            }, 
+                model: Author,
+                as: 'authors'
+            },
             {
-                model: Tag
-            }, 
+                model: Tag,
+                as: 'tags'
+            },
             {
-                model: Author
+                model: Publisher,
+                as: 'publisher'
             }
-        ]
+        ],
+        where: {
+            [Op.and]: [
+                {
+                    isbn: {
+                        [Op.iLike]: `%${isbn}%`
+                    },
+                    title: {
+                        [Op.iLike]: `%${title}%`
+                    },
+                },
+                {
+                    '$category.name$': {
+                        [Op.iLike]: `%${category}%`
+                    }
+                },
+                {
+                    '$authors.name$': {
+                        [Op.iLike]: `%${authorName}%`
+                    }
+                },
+                {
+                    '$publisher.name$': {
+                        [Op.iLike]: `%${publisherName}%`
+                    }
+                }
+            ]
+        }
     })
+
+    return res.status(200).json(books)
+}
+
+exports.generalSearch = async (req, res) => {
+    const query = req.body.query.toLowerCase()
+
+    const books = await Book.findAll({
+        include: [
+            {
+                model: Category,
+                as: 'category'
+            },
+            {
+                model: Author,
+                as: 'authors'
+            },
+            {
+                model: Tag,
+                as: 'tags'
+            },
+            {
+                model: Publisher,
+                as: 'publisher'
+            }
+        ],
+        where: {
+            [Op.or]: [
+                {
+                    title: {
+                        [Op.iLike]: `%${query}%`
+                    },
+
+                },
+                {
+                    '$category.name$': {
+                        [Op.iLike]: `%${query}%`
+                    }
+                },
+                {
+                    '$authors.name$': {
+                        [Op.iLike]: `%${query}%`
+                    }
+                },
+                {
+                    '$publisher.name$': {
+                        [Op.iLike]: `%${query}%`
+                    }
+                },
+                {
+                    '$tags.name$': {
+                        [Op.iLike]: `%${query}%`
+                    }
+                }
+            ]
+        }
+    })
+
+    return res.status(200).json(books)
+}
+
+
+exports.getByISBN = async (req, res) => {
+    const book = await Book.findOne(
+        {
+            where: {
+                isbn: req.body.isbn_number
+            },
+            include: [
+                {
+                    model: Publisher
+                },
+                {
+                    model: Category
+                },
+                {
+                    model: Tag
+                },
+                {
+                    model: Author
+                }
+            ]
+        }
+    )
 
     if (!book) {
         return res.status(400)
     }
+
     return res.status(200).json(book)
 }
 
@@ -68,13 +191,13 @@ exports.getTwentyBookByCategory = async (req, res) => {
         include: [
             {
                 model: Publisher
-            }, 
+            },
             {
                 model: Category
-            }, 
+            },
             {
                 model: Tag
-            }, 
+            },
             {
                 model: Author
             }
@@ -99,13 +222,13 @@ exports.getAllByCategory = async (req, res) => {
         include: [
             {
                 model: Publisher
-            }, 
+            },
             {
                 model: Category
-            }, 
+            },
             {
                 model: Tag
-            }, 
+            },
             {
                 model: Author
             }
@@ -116,49 +239,46 @@ exports.getAllByCategory = async (req, res) => {
 }
 
 exports.register = async (req, res) => {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+    console.log(req.body)
 
-    const admin = jwtDecode(token)
+    try {
+        const authHeader = req.headers['authorization']
+        const token = authHeader && authHeader.split(' ')[1]
 
-    const requestedCategory = req.body.category
-    const category = await Category.findOne({
-        where: {
-            name: requestedCategory.name
-        },
-        raw: true
-    })
+        const admin = jwtDecode(token)
 
-    const requestedPublisher = req.body.publisher
-    let publisher = await Publisher.findOne({
-        where: {
-            name: requestedPublisher.name
-        },
-        raw: true
-    })
-
-    if (!publisher) {
-        Publisher.create({
-            name: requestedPublisher.name,
-            email: requestedPublisher.email,
-            contactno: requestedPublisher.contactno,
-            address: requestedPublisher.address
+        const category = await Category.findOne({
+            where: {
+                name: req.body.category_name
+            }
         })
+
+        let publisher = await Publisher.findOne({
+            where: {
+                name: req.body.publisher_name
+            }
+        })
+
+        if (!publisher) {
+            await Publisher.create({
+                name: req.body.publisher_name,
+                email: req.body.publisher_email,
+                contactno: req.body.publisher_contactno,
+                address: req.body.publisher_address
+            })
+        }
 
         publisher = await Publisher.findOne({
             where: {
-                name: requestedPublisher.name
-            },
-            raw: true
+                name: req.body.publisher_name
+            }
         })
-    }
 
-    try {
-        let book = await Book.findByPk(req.body.isbn_number)
+        let book = await Book.findOne({ where: { isbn: req.body.isbn_number } })
 
         if (!book) {
             book = await Book.create({
-                isbn_number: req.body.isbn_number,
+                isbn: req.body.isbn_number,
                 category_id: category.id,
                 title: req.body.title,
                 edition: req.body.edition,
@@ -167,33 +287,31 @@ exports.register = async (req, res) => {
                 synopsis: req.body.synopsis,
                 price: req.body.price,
                 image_path: req.body.image_path,
-            }, {
-                raw: true
             })
-            
-            const requestTags = req.body.tag
+
+            const requestTags = req.body.tags.split(',')
+
             let i = 0
             for (i = 0; i < requestTags.length; i++) {
                 const temp = requestTags[i]
 
                 let tag = await Tag.findOne({
                     where: {
-                        name: temp.name
+                        name: temp
                     }
-                }, {
-                    raw: true
                 })
 
                 if (!tag) {
                     tag = await Tag.create({
-                        name: temp.name
+                        name: temp
                     })
                 }
 
                 book.addTag(tag)
             }
 
-            const requestAuthors = req.body.author
+            const requestAuthors = req.body.authors
+
             i = 0
             for (i = 0; i < requestAuthors.length; i++) {
                 const temp = requestAuthors[i]
@@ -218,75 +336,100 @@ exports.register = async (req, res) => {
         }
 
         const bookEntered = await BookEntered.create({
-            book_isbn_number: book.isbn_number,
+            book_id: book.id,
             date_created: new Date,
             created_by: admin.id,
             borrowed: 0
-        }, {
-            raw: true
         })
 
-        return res.status(200)
-    } catch(error) {
+        return res.status(200).json({})
+    } catch (error) {
         console.log(`Error: ${error}`)
-        return res.status(400)
+        return res.status(400).json({})
     }
 }
 
 exports.update = async (req, res) => {
+    // Edit category
     const category = await Category.findOne({
         where: {
-            name: req.body.category
+            name: req.body.category_name
         }
     })
 
-    requestedPublisher = req.body.publisher
-    let publisher = await Publisher.findOne({
+    let publisher_name
+
+    // Edit publisher
+    if (req.body.old_publisher_name.localeCompare(req.body.new_publisher_name) === 0) {
+        const old_publisher = req.body.old_publisher_name
+
+        await Publisher.update({
+            email: req.body.publisher_email,
+            contactno: req.body.publisher_contactno,
+            address: req.body.publisher_address
+        }, {
+            where: {
+                name: old_publisher
+            }
+        })
+
+        publisher_name = old_publisher
+    }
+
+    // New publisher
+    else {
+        await Publisher.create({
+            name: req.body.new_publisher_name,
+            email: req.body.publisher_email,
+            contactno: req.body.publisher_contactno,
+            address: req.body.publisher_address
+        })
+
+        publisher_name = req.body.new_publisher_name
+    }
+
+    const publisher = await Publisher.findOne({
         where: {
-            name: requestedPublisher.name
+            name: publisher_name
         }
     })
 
-    publisher = await Publisher.update({
-        name: requestedPublisher.name,
-        email: requestedPublisher.email,
-        contactno: requestedPublisher.contactno,
-        address: requestedPublisher.address
-    }, {
-        where: {
-            name: requestedPublisher.name
-        }
-    })
-
-    Book.update({
-        isbn_number: req.body.isbn_number,
+    // Edit book
+    await Book.update({
+        isbn: req.body.new_isbn_number,
         category_id: category.id,
         title: req.body.title,
         edition: req.body.edition,
         publisher_id: publisher.id,
         publication_year: req.body.publication_year,
         synopsis: req.body.synopsis,
-        price: req.body.price,
+        price: req.body.price || 0,
         image_path: req.body.image_path
     }, {
         where: {
-            isbn_number: req.body.isbn_number
+            isbn: req.body.old_isbn_number
         }
     })
 
-    const book = await Book.findByPk(req.body.isbn_number)
+    const book = await Book.findOne({
+        where: {
+            isbn: req.body.new_isbn_number
+        }
+    })
 
-    const requestedTags = req.body.tag
+    // Edit tags
+    const requestedTags = req.body.tags.split(',')
 
     const tags = await Tag.findAll()
     book.removeTags(tags)
+
     let i = 0;
     for (i = 0; i < requestedTags.length; i++) {
         const temp = requestedTags[i]
 
         let tag = await Tag.findOne({
             where: {
-                name: temp.name
+                name: temp
             }
         }, {
             raw: true
@@ -294,17 +437,19 @@ exports.update = async (req, res) => {
 
         if (!tag) {
             tag = await Tag.create({
-                name: temp.name
+                name: temp
             })
         }
 
         book.addTag(tag)
     }
 
+    // Edit authors
     const authors = await Author.findAll()
-
     book.removeAuthors(authors)
-    const requestedAuthors = req.body.author
+
+    const requestedAuthors = req.body.authors
+
     for (i = 0; i < requestedAuthors.length; i++) {
         const temp = requestedAuthors[i]
 
@@ -323,48 +468,61 @@ exports.update = async (req, res) => {
                 contactno: temp.contactno,
                 address: temp.address
             })
+        } else {
+            author.update(
+                {
+                    name: temp.name,
+                    email: temp.email,
+                    contactno: temp.contactno,
+                    address: temp.address
+                }
+            )
         }
 
         book.addAuthor(author)
     }
 
-    return response.status(200)
-}
+    // Handle old publisher
 
-exports.borrowRequest = async (req, res) => {
-    const authHeader = req.headers['authorization']
-    let studentInformation
-    let token
-    
-    token = authHeader.split(' ')[1]
-    studentInformation = jwtDecode(token)
-    
-    const bookEntered = await BookEntered.findOne({
+    const oldPublisher = await Publisher.findOne({
         where: {
-            book_isbn_number: req.body.isbn_number,
-            borrowed: 0
+            name: req.body.old_publisher_name
         }
     })
 
-    if (!bookEntered) {
-        return res.status(400).json({
-            message: "No more available book."
-        })
+    const oldPublisherBooks = await Book.findOne({
+        where: {
+            publisher_id: oldPublisher.id
+        }
+    })
+
+    if (!oldPublisherBooks) {
+        oldPublisher.destroy()
     }
 
-    const borrowRequest = await BorrowRequest.create({
-        student_id: studentInformation.id,
-        book_entered_id: bookEntered.id,
-        date_requested: new Date
-    })
 
-    await bookEntered.update({
-        borrowed: 1
-    })
+    // Handle old authors
+    const oldRequestedAuthors = req.body.old_authors
 
-    return res.status(200).json()
-}
+    for (i = 0; i < oldRequestedAuthors.length; i++) {
+        const temp = oldRequestedAuthors[i]
 
-exports.search = async (req, res) => {
-    
+        const author = await Author.findOne({
+            where: {
+                name: temp.name
+            }
+        })
+
+        const book_author = await BookAuthor.findOne({
+            where: {
+                author_id: author.id
+            }
+        })
+
+        if (!book_author) {
+            author.destroy()
+        }
+    }
+
+    return res.status(200).json({})
 }

@@ -4,7 +4,7 @@ router = express.Router()
 const admin = require('../services/admin')
 const student = require('../services/student')
 
-router.get('/adminLogin', admin.login)
-router.get('/studentLogin', student.login)
+router.post('/adminLogin', admin.login)
+router.post('/studentLogin', student.login)
 
 module.exports = router

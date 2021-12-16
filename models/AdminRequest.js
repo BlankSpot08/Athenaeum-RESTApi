@@ -39,13 +39,6 @@ const AdminRequest = database.define('admin_request', {
 }, {
     freezeTableName: true,
     timestamps: false,
-    hooks: {
-        afterValidate: (admin_request) => {
-            if (admin_request.password) {
-                admin_request.password = bcrypt.hashSync(admin_request.password, 10)
-            }
-        }
-    },
 })
 
 module.exports = AdminRequest;

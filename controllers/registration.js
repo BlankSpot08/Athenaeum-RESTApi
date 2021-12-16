@@ -4,7 +4,7 @@ router = express.Router()
 const adminRequest = require('../services/adminRequest')
 const student = require('../services/student')
 
-router.get('/studentRegister', student.register)
+router.post('/studentRegister', student.register)
 router.post('/adminRegister', adminRequest.register)
 
 module.exports = router

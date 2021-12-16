@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
 
     filename: (req, file, cb) => {
         req.body.image_path = file.originalname
-        
+                
         cb(null, file.originalname)
     }
 })

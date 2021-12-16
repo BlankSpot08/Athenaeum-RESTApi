@@ -1,6 +1,12 @@
 const AdminRequest = require('../models/AdminRequest')
 const Admin = require('../models/Admin')
 
+exports.getAll = async (req, res) => {
+    const adminRequests = await AdminRequest.findAll()
+
+    return res.status(200).json(adminRequests)
+}
+
 exports.register = async (req, res) => {
     const adminRequest = await AdminRequest.create({
         id: req.body.id,
@@ -21,12 +27,12 @@ exports.acceptRegistration = async (req, res) => {
 
     const admin = await Admin.create({
         id: adminRequest.id,
-        password: adminRequestpassword,
-        firstname: adminRequestfirstname,
-        middlename: adminRequestmiddlename,
-        lastname: adminRequestlastname,
-        emailaddress: adminRequestemailaddress,
-        contactno: adminRequestcontactno,
+        password: adminRequest.password,
+        firstname: adminRequest.firstname,
+        middlename: adminRequest.middlename,
+        lastname: adminRequest.lastname,
+        emailaddress: adminRequest.emailaddress,
+        contactno: adminRequest.contactno,
         role: `admin`,
     })
 

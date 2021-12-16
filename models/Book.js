@@ -11,10 +11,14 @@ const StudentBookList = require('../models/StudentBookList');
 const StudentReadAgain = require('../models/StudentReadAgain');
 
 const Book = database.define('book', {
-    isbn_number: {
+    id: {
+        type: UUIDV4,
+        primaryKey: true,
+        defaultValue: UUIDV4
+    },
+    isbn: {
         type: STRING(20),
         allowNull: false,
-        primaryKey: true,
     },
     category_id: {
         type: UUIDV4,
@@ -71,7 +75,7 @@ Category.hasOne(Book, {
 })
 
 Book.belongsToMany(Tag, {
-    foreignKey: 'book_isbn_number',
+    foreignKey: 'book_id',
     through: {
         model: BookTag
     }
@@ -86,7 +90,7 @@ BookTag.belongsTo(Book)
 BookTag.belongsTo(Tag)
 
 Book.belongsToMany(Author, {
-    foreignKey: 'book_isbn_number',
+    foreignKey: 'book_id',
     through: {
         model: BookAuthor
     }
@@ -101,17 +105,17 @@ BookAuthor.belongsTo(Book)
 BookAuthor.belongsTo(Author)
 
 Book.hasMany(StudentBookList, {
-    foreignKey: 'book_isbn_number'
+    foreignKey: 'book_id'
 })
 StudentBookList.belongsTo(Book, {
-    foreignKey: 'book_isbn_number'
+    foreignKey: 'book_id'
 })
 
 Book.hasMany(StudentReadAgain, {
-    foreignKey: 'book_isbn_number'
+    foreignKey: 'book_id'
 })
 StudentReadAgain.belongsTo(Book, {
-    foreignKey: 'book_isbn_number'
+    foreignKey: 'book_id'
 })
 
 module.exports = Book;
